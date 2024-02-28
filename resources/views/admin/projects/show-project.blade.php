@@ -23,6 +23,8 @@
                         <h5 class="card-title">{{ $project->name }}</h5>
                         <p class="card-text">Slug: {{ $project->slug }}</p>
                         <p class="card-text">{{ $project->description }}</p>
+                        <p class="card-text">Tipologia Associata:
+                            {{ $project->type ? $project->type->name : 'Nessun tipo' }}</p>
                         <div class="text-secondary">Data Creazione: {{ $project->start_date }}</div>
                         <div class="text-secondary">Data Fine: {{ $project->end_date }}</div>
                     </div>
