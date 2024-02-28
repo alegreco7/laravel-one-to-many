@@ -6,6 +6,7 @@ use App\Models\Project;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreProjectRequest;
 use App\Http\Requests\UpdateProjectRequest;
+use App\Models\Type;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str ;
 use function PHPUnit\Framework\isNull;
@@ -20,7 +21,8 @@ class ProjectController extends Controller
     public function index()
     {
         $projects = Project::all();
-        return view('admin.projects.index-project', compact('projects'));
+        $types = Type::all();
+        return view('admin.projects.index-project', compact('projects', 'types'));
     }
 
     /**
@@ -30,7 +32,8 @@ class ProjectController extends Controller
      */
     public function create()
     {
-        return view('admin.projects.create-project');
+        $types = Type::all();
+        return view('admin.projects.create-project', compact('types'));
     }
 
     /**
@@ -73,7 +76,8 @@ class ProjectController extends Controller
      */
     public function edit(Project $project)
     {
-        return view('admin.projects.edit-project', compact('project'));
+        $types = Type::all();
+        return view('admin.projects.edit-project', compact('project','types'));
     }
 
     /**
@@ -86,6 +90,11 @@ class ProjectController extends Controller
     public function update(UpdateProjectRequest $request, Project $project)
     {
         $form_data = $request->all();
+        $id = Project::where('name', 'LIKE', $form_data['name'])->where('id', '!=', $project->id)->get();
+        if (count($id) > 0) {
+            $error_message = 'Hai inserito un titolo già presente in un altro articolo';
+            return redirect()->route('admin.project.edit', compact('project', 'error_message'));
+        }
         if ($request->hasFile('img')) {
             $img_path = Storage::disk('public')->put('uploads', $form_data['img']);
             $form_data['img'] = $img_path;
